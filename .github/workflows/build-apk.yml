@@ -3,7 +3,6 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,12 +15,15 @@ jobs:
           distribution: 'temurin'
       - name: Unzip project
         run: |
+          ls
           unzip -o NotesPro_completo.zip
           ls
       - name: Build Debug APK
         run: |
-          PROJECT_DIR=$(ls -d */ | head -n 1)
-          echo "Proyecto en $PROJECT_DIR"
+          # Busca donde está el gradlew de verdad
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+          echo "Encontrado en $GRADLEW_PATH"
+          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
           cd "$PROJECT_DIR"
           chmod +x gradlew
           ./gradlew assembleDebug
