@@ -1,0 +1,43 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Descomprimir proyecto (si subiste el .zip)
+        run: |
+          if [ -f NotesPro_completo.zip ]; then
+            unzip -q -o NotesPro_completo.zip -d project
+            echo "PROJECT_DIR=project/NotesPro" >> "$GITHUB_ENV"
+          else
+            echo "PROJECT_DIR=." >> "$GITHUB_ENV"
+          fi
+
+      - name: Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Instalar Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Compilar APK
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: gradle assembleDebug --stacktrace
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NotesPro-debug-apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
+          
