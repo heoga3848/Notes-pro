@@ -15,18 +15,14 @@ jobs:
           distribution: 'temurin'
       - name: Unzip project
         run: |
-          ls
           unzip -o NotesPro_completo.zip
-          ls
+          ls -la NotesPro/
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build Debug APK
         run: |
-          # Busca donde está el gradlew de verdad
-          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-          echo "Encontrado en $GRADLEW_PATH"
-          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
-          cd "$PROJECT_DIR"
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          cd NotesPro
+          gradle assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
